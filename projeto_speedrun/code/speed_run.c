@@ -83,9 +83,11 @@ static void solution_1_recursion_otimizado(int move_number,int position,int spee
 {
   int i,new_speed;
 
+  if (solution_1_best.n_moves != final_position + 100) return;
+
   solution_1_count++;
   solution_1.positions[move_number] = position;
-
+   
   if(position == final_position && speed == 1)
   {
     // is it a better solution?
@@ -100,29 +102,37 @@ static void solution_1_recursion_otimizado(int move_number,int position,int spee
   //try Rafaela
   if(final_position <= 3){
     solution_1_best.n_moves = final_position;
-  }
+  }else{
+    for(new_speed = speed + 1;new_speed >= speed - 1;new_speed--) // testar primeiro quando a velocidade aumenta
+      if(new_speed >= 1 && new_speed <= _max_road_speed_ && position + new_speed <= final_position){
+        for(i = 0; new_speed <= max_road_speed[position + i]; i++)
+          ;
+        
+        if(solution_1_best.positions[move_number] > solution_1.positions[move_number]){
+          return;
+        }
 
-  for(new_speed = speed + 1;new_speed >= speed - 1;new_speed--) // testar primeiro quando a velocidade aumenta
-    if(new_speed >= 1 && new_speed <= _max_road_speed_ && position + new_speed <= final_position){
-      for(i = 0; new_speed <= max_road_speed[position + i]; i++)
-        ;
-      
-      if(solution_1_best.positions[move_number] > solution_1.positions[move_number]){
-        return;
+        if(i>new_speed)
+          solution_1_recursion_otimizado(move_number + 1, position + new_speed, new_speed, final_position);
       }
-
-      if(i>new_speed)
-        solution_1_recursion_otimizado(move_number + 1, position + new_speed, new_speed, final_position);
     }
 }
 
-static void solve_1(int final_position)
-{
+
+//rest of the code
+
+static void solve_1(int final_position){
   if(final_position < 1 || final_position > _max_road_size_)
   {
     fprintf(stderr,"solve_1: bad final_position\n");
     exit(1);
   }
+  // solution_1_elapsed_time = cpu_time();
+  // solution_1_count = 0ul;
+  // solution_1_best.n_moves = final_position + 100;
+  // solution_1_recursion_otimizado(0,0,0,final_position);
+  // solution_1_elapsed_time = cpu_time() - solution_1_elapsed_time;
+
   solution_1_elapsed_time = cpu_time();
   solution_1_count = 0ul;
   solution_1_best.n_moves = final_position + 100;
@@ -185,7 +195,7 @@ int main(int argc,char *argv[argc + 1])
   printf("--- + --- ---------------- --------- +\n");
   while(final_position <= _max_road_size_/* && final_position <= 20*/)
   {
-    print_this_one = (final_position == 4 || final_position == 15 || final_position == 35 || final_position == 400) ? 1 : 0;
+    print_this_one = (final_position == 4 || final_position == 200) ? 1 : 0;
     printf("%3d |",final_position);
     // first solution method (very bad)
     if(solution_1_elapsed_time < _time_limit_)
